@@ -21,9 +21,18 @@
   --crevasse: #35a8d8;
   --sun: #dff6fb;
 
+  /*
+    Alpenglow. The sky above a snowfield goes rose at either end of the day,
+    so the site runs warm above the waterline and cold below it: pink sky,
+    white ice, blue depth.
+  */
+  --rose: #f7b8cd;
+  --rose-deep: #87304c;
+  --blush: #fde4e3;
+
   /* Above the waterline */
-  --above-fg: #061620;
-  --above-muted: #3d5a6b;
+  --above-fg: #191320;
+  --above-muted: #5c4a58;
 
   /* Below the waterline */
   --below-fg: #e8f5fa;
@@ -48,6 +57,9 @@
   --color-glacier: var(--glacier);
   --color-crevasse: var(--crevasse);
   --color-sun: var(--sun);
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-blush: var(--blush);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

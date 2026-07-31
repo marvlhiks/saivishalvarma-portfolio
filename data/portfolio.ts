@@ -45,22 +45,23 @@ export const projects: Project[] = [
     depth: 40,
     strand: "work",
     status: "Shipping",
-    roles: ["Product lead", "QA", "Release manager"],
+    roles: ["Product lead", "Data scientist / developer", "QA"],
     summary:
       "A classification API that reads a legal matter and scores every document for relevance, so review teams read the useful few percent instead of all of it.",
     detail:
-      "Document review is the most expensive part of litigation, and most of what gets read turns out to be irrelevant. ReefML learns from a small labelled set and scores the whole corpus responsive or non responsive, so reviewers work a ranked queue instead of a flat list. I own strategy and delivery: compute and quality toward market readiness, staging releases, and the validation path into production.",
+      "Document review is the most expensive part of litigation, and most of what gets read turns out to be irrelevant. ReefML learns from a small labelled set and scores the whole corpus responsive or non responsive, so reviewers work a ranked queue instead of a flat list. I own strategy and delivery, and I wrote the TF-IDF vectorizers that turn raw matter documents into the features the classifier actually scores.",
     metrics: [
       { value: "2M", label: "documents per matter" },
       { value: "87%", label: "recall, 22K doc benchmark" },
       { value: "300K", label: "docs in production validation" },
     ],
     notes: [
+      "Built the TF-IDF vectorizers feeding the scoring and iterative training paths.",
       "Up to 2 million documents can be processed for a single matter.",
       "Stakeholder alignment for the production testing path is complete.",
       "Benchmarked on quality against competitor tooling, not just on latency and cost.",
     ],
-    stack: ["Python", "FastAPI", "Databricks", "Docker", "Azure"],
+    stack: ["Python", "Spark ML", "TF-IDF", "Databricks", "FastAPI", "Docker", "Azure"],
     visual: "scoreband",
   },
   {

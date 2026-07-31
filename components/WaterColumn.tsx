@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { IcebergSilhouette } from "@/components/IcebergSilhouette";
 import {
   motion,
   useMotionValue,
@@ -53,6 +54,31 @@ export function WaterColumn() {
   );
   const voidOpacity = useTransform(scrollYProgress, [0.25, 1], [0, 0.9]);
   const snowOpacity = useTransform(cross, [0.3, 1], [0, 1]);
+  // Sunset colour reaches a little way under the surface, then the water
+  // takes it. Red goes first in water, which is why the deep stays blue.
+  const roseOpacity = useTransform(scrollYProgress, [0, 0.3, 0.6], [1, 0.45, 0]);
+  /*
+    Slower than the page, so it reads as something you are moving past.
+    On the surface page it starts low, so the peaks sit in the white band of
+    the hero rather than up in the pink, and the mass runs down into the blue.
+    Pages that open underwater start it higher, since there is no sky to avoid.
+  */
+  const bergDrift = useTransform(
+    scrollYProgress,
+    [0, 1],
+    surface ? ["19%", "-34%"] : ["-7%", "-38%"],
+  );
+  // Barely a suggestion. Strong enough to feel, too faint to read as an image.
+  // A pale line on dark water carries far further than a grey one on pink, so
+  // the submerged state is dialled back to keep the berg equally quiet in both.
+  const bergBase = useTransform(cross, [0, 1], [0.18, 0.075]);
+  const bergFade = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.28]);
+  const bergOpacity = useTransform(
+    [bergBase, bergFade],
+    ([base, fade]: number[]) => base * fade,
+  );
+  // Dark enough to sit on the pink sky, pale enough to sit in the abyss.
+  const bergColor = useTransform(cross, [0, 1], ["#7d6470", "#dff6fb"]);
 
   return (
     <div aria-hidden className="dither pointer-events-none fixed inset-0 -z-10">
@@ -69,13 +95,26 @@ export function WaterColumn() {
         }}
       />
 
+      {/* Sunset bleeding down through the first stretch of water */}
+      <motion.div
+        className="absolute inset-x-0 top-0 h-[70vh]"
+        style={{
+          opacity: roseOpacity,
+          background:
+            "linear-gradient(180deg, rgba(247,184,205,0.3) 0%, rgba(226,132,163,0.16) 24%, rgba(163,78,107,0.07) 48%, transparent 76%)",
+          // Soft-light tints the water without lifting it toward grey the way
+          // screen does.
+          mixBlendMode: "soft-light",
+        }}
+      />
+
       {/* Light shafts breaking through from the surface */}
       <motion.div
         className="absolute inset-x-0 top-0 h-[85vh]"
         style={{
           opacity: shaftOpacity,
           background:
-            "repeating-linear-gradient(101deg, transparent 0 6vw, rgba(223,246,251,0.06) 6vw 8.5vw, transparent 8.5vw 15vw)",
+            "repeating-linear-gradient(101deg, transparent 0 6vw, rgba(255,235,238,0.07) 6vw 8.5vw, transparent 8.5vw 15vw)",
           // Blur turns hard stripes into light, which is the whole point.
           filter: "blur(22px)",
           maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), transparent)",
@@ -108,7 +147,8 @@ export function WaterColumn() {
           className="caustic h-full w-full"
           style={{
             background:
-              "repeating-linear-gradient(84deg, transparent 0 34px, rgba(223,246,251,0.18) 34px 44px, transparent 44px 92px), repeating-linear-gradient(-78deg, transparent 0 48px, rgba(127,227,240,0.14) 48px 56px, transparent 56px 120px)",
+              // Warm ripples nearer the surface, cool ones under them.
+              "repeating-linear-gradient(84deg, transparent 0 34px, rgba(255,226,232,0.2) 34px 44px, transparent 44px 92px), repeating-linear-gradient(-78deg, transparent 0 48px, rgba(127,227,240,0.14) 48px 56px, transparent 56px 120px)",
             filter: "blur(9px)",
             maskImage: "linear-gradient(180deg, rgba(0,0,0,0.9), transparent)",
             WebkitMaskImage:
@@ -123,19 +163,37 @@ export function WaterColumn() {
           className="absolute inset-0"
           style={{
             opacity: iceOpacity,
+            // Alpenglow: rose sky at the top, white through the ice, cold blue
+            // by the time you reach the water.
             background:
-              "linear-gradient(178deg, #fbfdfe 0%, #f4f9fc 22%, #eef6fa 40%, #e6f1f7 56%, #dcecf4 70%, #d2e6f0 85%, #c6dfec 100%)",
+              "linear-gradient(178deg, #f7b8cd 0%, #fac7d5 12%, #fcd8dd 24%, #fde7e4 36%, #fdf2ee 48%, #f9fafc 60%, #f0f6fa 72%, #e2eff6 86%, #cfe4ef 100%)",
           }}
         >
           <div
-            className="absolute inset-0 opacity-70"
+            className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(80% 55% at 72% 8%, rgba(255,255,255,0.95) 0%, transparent 60%), radial-gradient(60% 45% at 12% 30%, rgba(127,227,240,0.18) 0%, transparent 70%)",
+                // A low sun off to one side, and its warmth pooling on the snow.
+                "radial-gradient(38% 26% at 74% 12%, rgba(255,246,240,0.95) 0%, rgba(255,214,222,0.45) 45%, transparent 72%), radial-gradient(70% 45% at 20% 4%, rgba(247,184,205,0.5) 0%, transparent 65%), radial-gradient(55% 40% at 8% 46%, rgba(127,227,240,0.16) 0%, transparent 70%)",
             }}
           />
         </motion.div>
       )}
+
+      {/*
+        The berg, in outline, over everything else in the backdrop so it reads
+        on the pink sky as well as in the deep. Its colour crosses with you:
+        warm grey against the ice, pale meltwater once under. It drifts up as
+        you scroll, so descending uncovers more of the mass below the line.
+      */}
+      <motion.div
+        className="absolute inset-0 flex justify-center"
+        style={{ y: bergDrift, opacity: bergOpacity, color: bergColor }}
+      >
+        <div className="h-[150vh] w-[min(150vw,1300px)]">
+          <IcebergSilhouette />
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -28,31 +28,31 @@ export function Hero() {
         style={reduce ? undefined : { y: lift, opacity: fade }}
       >
         <motion.p
-          className="t-rail text-[#2c6f92]"
+          className="t-rail text-rose-deep"
           {...rise(0)}
         >
           {profile.title}
         </motion.p>
 
         <motion.h1
-          className="t-display mt-7 max-w-[11ch] text-[clamp(3.2rem,12vw,9.5rem)] text-[#061620]"
+          className="t-display mt-7 max-w-[11ch] text-[clamp(3.2rem,12vw,9.5rem)] text-[#191320]"
           {...rise(0.08)}
         >
           {profile.shortName}
         </motion.h1>
 
         <motion.p
-          className="mt-8 max-w-xl text-lg leading-relaxed text-[#28485b] md:text-xl"
+          className="mt-8 max-w-xl text-lg leading-relaxed text-[#3b2b39] md:text-xl"
           {...rise(0.18)}
         >
           {profile.tagline}
         </motion.p>
 
         <motion.div className="mt-14 flex items-center gap-4" {...rise(0.32)}>
-          <span className="t-rail text-[#3d5a6b]/70">Scroll to submerge</span>
+          <span className="t-rail text-[#5c4a58]/80">Scroll to submerge</span>
           <motion.span
             aria-hidden
-            className="text-[#2c6f92]"
+            className="text-rose-deep"
             animate={reduce ? undefined : { y: [0, 7, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >

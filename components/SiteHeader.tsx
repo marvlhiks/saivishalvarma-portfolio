@@ -12,8 +12,9 @@ const links = [
 ];
 
 /**
- * The header has to survive the crossing: dark type on ice above the
- * waterline, pale type once the page submerges.
+ * A solid slab, inverted against whatever is behind it: near-black over the
+ * pink sky, ice over the deep water. The earlier translucent version sat
+ * halfway between blending and standing apart, and read as neither.
  */
 export function SiteHeader() {
   const pathname = usePathname();
@@ -24,41 +25,43 @@ export function SiteHeader() {
 
   useMotionValueEvent(scrollY, "change", (y) => {
     if (!isSurface) return;
-    const next = y > (typeof window === "undefined" ? 600 : window.innerHeight * 0.55);
+    const next =
+      y > (typeof window === "undefined" ? 600 : window.innerHeight * 0.55);
     setUnder((prev) => (prev === next ? prev : next));
   });
 
   const submerged = isSurface ? under : true;
-  const fg = submerged ? "text-sun" : "text-[#061620]";
-  const dim = submerged ? "text-sun/60" : "text-[#3d5a6b]";
+
+  const slab = submerged ? "bg-[#e9f5fa]" : "bg-[#171018]";
+  const fg = submerged ? "text-[#06212f]" : "text-[#fdf2ee]";
+  const dim = submerged ? "text-[#06212f]/55" : "text-[#fdf2ee]/60";
+  const hot = submerged ? "text-[#0a5c7d]" : "text-[#f7b8cd]";
+  const pill = submerged
+    ? "bg-[#06212f] text-[#e9f5fa] hover:bg-[#0a3346]"
+    : "bg-[#f7b8cd] text-[#2b0f1c] hover:bg-[#fbd0dc]";
+  const rule = submerged ? "divide-[#06212f]/10" : "divide-[#fdf2ee]/12";
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${
-        submerged
-          ? "border-b border-glacier/10 bg-abyss/55 backdrop-blur-xl"
-          : "border-b border-[#061620]/8 bg-white/45 backdrop-blur-xl"
-      }`}
+      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${slab}`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-4 md:px-8">
         <Link
           href="/"
           onClick={() => setOpen(false)}
-          className={`t-display text-base tracking-tight transition-colors ${fg}`}
+          className={`t-display text-base tracking-tight ${fg}`}
         >
           {profile.shortName}
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
           {links.map((l) => {
-            const active = pathname.startsWith(l.href);
+            const on = pathname.startsWith(l.href);
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`t-rail transition-colors hover:text-glacier ${
-                  active ? "text-glacier" : dim
-                }`}
+                className={`t-rail ${on ? hot : dim}`}
               >
                 {l.label}
               </Link>
@@ -68,11 +71,7 @@ export function SiteHeader() {
             href={profile.resume}
             target="_blank"
             rel="noreferrer"
-            className={`t-rail rounded-full border px-4 py-2 transition-colors ${
-              submerged
-                ? "border-glacier/35 text-glacier hover:bg-glacier/12"
-                : "border-[#061620]/20 text-[#061620] hover:bg-[#061620]/6"
-            }`}
+            className={`t-rail rounded-full px-5 py-2.5 ${pill}`}
           >
             Résumé
           </a>
@@ -83,26 +82,15 @@ export function SiteHeader() {
           aria-expanded={open}
           aria-controls="site-menu"
           onClick={() => setOpen((v) => !v)}
-          className={`t-rail rounded-full border px-3.5 py-2 md:hidden ${
-            submerged
-              ? "border-glacier/30 text-glacier"
-              : "border-[#061620]/20 text-[#061620]"
-          }`}
+          className={`t-rail rounded-full px-4 py-2.5 md:hidden ${pill}`}
         >
           {open ? "Close" : "Menu"}
         </button>
       </nav>
 
       {open && (
-        <div
-          id="site-menu"
-          className={`md:hidden ${
-            submerged
-              ? "border-t border-glacier/10 bg-abyss/95"
-              : "border-t border-[#061620]/8 bg-white/95"
-          }`}
-        >
-          <ul className="flex flex-col px-5 py-2">
+        <div id="site-menu" className={`md:hidden ${slab}`}>
+          <ul className={`flex flex-col divide-y px-5 pb-3 ${rule}`}>
             {links.map((l) => (
               <li key={l.href}>
                 <Link

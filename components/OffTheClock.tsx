@@ -107,8 +107,12 @@ export function OffTheClock({
         Keyed on the tab so React remounts and the panel fades in. Deliberately
         no exit animation: AnimatePresence in wait mode can deadlock here and
         strand the outgoing panel on screen, and a fade in is all this needs.
+
+        The reserved height matters as much: Gaming used to be far taller than
+        the others, so switching tabs changed the page height and pulled the
+        footer up into view.
       */}
-      <div className="mt-10 min-h-[14rem]">
+      <div className="mt-10 min-h-[18rem] sm:min-h-[33rem]">
         <motion.div
           key={active}
           id={`${panelId}-${active}`}
@@ -161,13 +165,7 @@ function Grid({
 }) {
   return (
     <div
-      className={
-        wide
-          ? "grid max-w-xl gap-4"
-          : showTitles
-            ? "grid gap-4 sm:grid-cols-2"
-            : "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
-      }
+      className={`grid max-w-3xl gap-4 ${wide ? "" : "grid-cols-2"}`}
     >
       {items.slice(0, 8).map((item, i) => (
         <button
@@ -175,9 +173,9 @@ function Grid({
           type="button"
           onClick={() => onOpen(i)}
           aria-label={`Open ${item.title}`}
-          // Covers and key art are 16:9; photographs are not.
+          // Covers and key art are 16:9; these photographs are 3:2.
           className={`group relative overflow-hidden rounded-xl border border-glacier/12 text-left ${
-            showTitles ? "aspect-video" : "aspect-4/3"
+            showTitles ? "aspect-video" : "aspect-3/2"
           }`}
         >
           <span className="absolute inset-0 transition-transform duration-700 group-hover:scale-105">
@@ -186,7 +184,7 @@ function Grid({
                 src={item.src}
                 alt={item.title}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                sizes="(max-width: 640px) 50vw, 384px"
                 className="object-cover"
               />
             ) : (
@@ -220,11 +218,11 @@ function Grid({
 function EmptyGallery() {
   return (
     <div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid max-w-3xl grid-cols-2 gap-4">
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="pane-submerged shimmer aspect-4/3 rounded-xl"
+            className="pane-submerged shimmer aspect-3/2 rounded-xl"
             style={{ animationDelay: `${i * 0.5}s` }}
           />
         ))}
