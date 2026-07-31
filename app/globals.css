@@ -1,84 +1,229 @@
 @import "tailwindcss";
 
+/*
+  Iceberg. One idea, carried everywhere: depth.
+  The tip is pale, spare, and cold. Everything of substance is below the
+  waterline, and the further you descend the darker and quieter it gets.
+*/
 :root {
-  --background: #f7f9fc;
-  --foreground: #070b14;
-  --muted: #3a4a5c;
-  --accent: #1557e0;
-  --accent-neon: #2f7bff;
-  --accent-glow: rgba(21, 87, 224, 0.22);
-  --surface: rgba(255, 255, 255, 0.92);
-  --line: rgba(21, 87, 224, 0.35);
+  /* Depth scale — surface to abyss */
+  --ice-0: #f7fbfd;
+  --ice-1: #e6f1f7;
+  --ice-2: #c6dfec;
+  --shallow: #77b4d1;
+  --mid: #226f97;
+  --deep: #0c3a58;
+  --abyss: #041826;
+  --void: #010a11;
+
+  /* Accents — meltwater and glacier light */
+  --glacier: #7fe3f0;
+  --crevasse: #35a8d8;
+  --sun: #dff6fb;
+
+  /* Above the waterline */
+  --above-fg: #061620;
+  --above-muted: #3d5a6b;
+
+  /* Below the waterline */
+  --below-fg: #e8f5fa;
+  --below-muted: #8fb2c4;
+
+  /* Defaults resolve to the deep — most of this site is underwater */
+  --background: var(--abyss);
+  --foreground: var(--below-fg);
+  --muted: var(--below-muted);
+  --line: rgba(127, 227, 240, 0.16);
 }
 
 @theme inline {
+  --color-ice-0: var(--ice-0);
+  --color-ice-1: var(--ice-1);
+  --color-ice-2: var(--ice-2);
+  --color-shallow: var(--shallow);
+  --color-mid: var(--mid);
+  --color-deep: var(--deep);
+  --color-abyss: var(--abyss);
+  --color-void: var(--void);
+  --color-glacier: var(--glacier);
+  --color-crevasse: var(--crevasse);
+  --color-sun: var(--sun);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-accent-neon: var(--accent-neon);
-  --color-surface: var(--surface);
-  --font-sans: var(--font-body);
+  --color-line: var(--line);
+
   --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+/* One easing for the whole site, so nothing moves in a different accent. */
+:root {
+  --ease-water: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
   scroll-behavior: smooth;
+  background: var(--void);
+}
+
+/*
+  A large blue gradient will band into visible stripes on 8-bit displays.
+  A faint noise layer dithers the steps away, which is the difference between
+  the water looking smooth and looking like a set of ramps.
+*/
+.dither::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 body {
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
   overflow-x: hidden;
-  font-weight: 500;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--glacier);
+  color: var(--void);
 }
 
-/* Body copy stays dark and readable over spray */
-.prose-body {
-  color: var(--foreground);
-  font-weight: 500;
+/* Every interactive thing eases the same way, at the same speed. */
+a,
+button {
+  transition:
+    color 320ms var(--ease-water),
+    background-color 320ms var(--ease-water),
+    border-color 320ms var(--ease-water),
+    opacity 320ms var(--ease-water),
+    transform 320ms var(--ease-water);
 }
 
-.prose-secondary {
-  color: var(--muted);
-  font-weight: 500;
+/* ---- Type ---- */
+
+.t-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  /* Large display type needs the descenders to breathe, not clip. */
+  padding-bottom: 0.04em;
 }
 
-@keyframes breathe {
+/* Small caps rail labels — depth readouts, section markers, metadata */
+.t-rail {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.t-num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Surfaces ---- */
+
+/* Ice: what you see above water — bright, faceted, thin */
+.pane-ice {
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(127, 227, 240, 0.04) 45%,
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(198, 223, 236, 0.14);
+  backdrop-filter: blur(6px);
+}
+
+/* Submerged: the mass below — denser, colder, edge-lit from one side */
+.pane-submerged {
+  background: linear-gradient(
+    165deg,
+    rgba(16, 66, 99, 0.44),
+    rgba(9, 40, 62, 0.5) 45%,
+    rgba(4, 24, 38, 0.6)
+  );
+  border: 1px solid rgba(127, 227, 240, 0.1);
+  backdrop-filter: blur(3px);
+}
+
+.edge-lit {
+  box-shadow: inset 1px 1px 0 rgba(223, 246, 251, 0.09);
+}
+
+/* The horizontal line where air meets water */
+.waterline-rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(127, 227, 240, 0.5) 15%,
+    rgba(223, 246, 251, 0.8) 50%,
+    rgba(127, 227, 240, 0.5) 85%,
+    transparent
+  );
+}
+
+/* ---- Motion ---- */
+
+@keyframes drift {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 0.45;
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.7;
+    transform: translate3d(0, -14px, 0);
   }
 }
 
-@keyframes softPulse {
+@keyframes shimmer {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.25;
   }
   50% {
     opacity: 0.6;
   }
 }
 
-.breathe {
-  animation: breathe 7s ease-in-out infinite;
+/* Caustics: the rippling light that plays on water just under the surface */
+@keyframes caustic {
+  0% {
+    transform: translate3d(-4%, 0, 0) scaleY(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(4%, 0, 0) scaleY(1.12);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(-4%, 0, 0) scaleY(1);
+    opacity: 0.35;
+  }
 }
 
-.soft-pulse {
-  animation: softPulse 5.5s ease-in-out infinite;
+.drift {
+  animation: drift 11s ease-in-out infinite;
+}
+
+.shimmer {
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+.caustic {
+  animation: caustic 14s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -86,8 +231,9 @@ body {
     scroll-behavior: auto;
   }
 
-  .breathe,
-  .soft-pulse {
+  .drift,
+  .shimmer,
+  .caustic {
     animation: none !important;
   }
 
@@ -98,4 +244,11 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Keyboard focus stays legible at every depth */
+:focus-visible {
+  outline: 2px solid var(--glacier);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
